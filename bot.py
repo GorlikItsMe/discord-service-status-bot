@@ -7,6 +7,7 @@ import os
 SETUP
 """
 CONFIG = os.environ.get('CONFIG', False)
+print(CONFIG)
 
 if CONFIG == False:
     try:
