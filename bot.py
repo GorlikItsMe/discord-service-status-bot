@@ -6,7 +6,8 @@ import os
 """
 SETUP
 """
-CONFIG = os.environ.get('CONFIG',False)
+CONFIG = os.environ.get('CONFIG', False)
+print(CONFIG)
 
 if CONFIG == False:
     try:
@@ -20,14 +21,14 @@ if CONFIG == False:
         print("use sample.config.json to configure")
         sys.exit(0)
 
+else:
+    CONFIG = json.loads(CONFIG)
 
 
 """
 Discord Bot
 """
-
 client = discord.Client()
-
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
@@ -39,5 +40,11 @@ async def on_message(message):
 
     if message.content.startswith('$hello'):
         await message.channel.send('Hello!')
+    elif message.content.startswith('$mc'):
+        import minecraft
+        await minecraft.server_status(CONFIG, message)
 
-client.run(CONFIG['token'])
+try:
+    client.run(CONFIG['token'])
+except:
+    print("Invalid token :(")
