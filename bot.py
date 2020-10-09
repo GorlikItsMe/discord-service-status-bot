@@ -6,7 +6,8 @@ import os
 """
 SETUP
 """
-CONFIG = os.environ.get('CONFIG',False)
+CONFIG = os.environ.get('CONFIG', False)
+print(CONFIG)
 
 if CONFIG == False:
     try:
@@ -20,6 +21,8 @@ if CONFIG == False:
         print("use sample.config.json to configure")
         sys.exit(0)
 
+else:
+    CONFIG = json.loads(CONFIG)
 
 
 """
