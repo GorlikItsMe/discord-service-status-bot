@@ -1,7 +1,13 @@
 {
     "token": "paste here discord bot token",
-    "channel_id": 302535592204566539,
-    "status_message_id": 292831199318114304,
-	
-	"minecraft_default": "IP:PORT"
+    "channel_id": 302535592204566539, 
+    "status_message_id": 292831199318114304, 
+    "update_time_sek": 60,
+    "embed_title": "Services Status",
+    "services": [
+        {"name": "Hypixel.net",     "type":"minecraft", "host":"hypixel.net"},
+        {"name": "EarthMC.net",     "type":"minecraft", "host":"play.EarthMC.net"},
+        {"name": "github.com SSH",  "type":"port",      "host":"140.82.113.4:22"},
+        {"name": "google.pl",       "type":"url",       "url":"https://google.pl"}
+    ]
 }
