@@ -2,49 +2,88 @@ import discord
 import json
 import sys
 import os
+import asyncio
+from datetime import datetime
+import time
 
-"""
-SETUP
-"""
-CONFIG = os.environ.get('CONFIG', False)
-print(CONFIG)
-
-if CONFIG == False:
-    try:
-        fp = open('config.json')
-        CONFIG = json.load(fp)
-        fp.close()
-    except:
-        print("ERROR")
-        print("config.json dont exist, change name sample.config.json to config.json")
-        print("If you use heroku you dont set CONFIG value")
-        print("use sample.config.json to configure")
-        sys.exit(0)
-
-else:
-    CONFIG = json.loads(CONFIG)
-
-
+from bot.config import CONFIG
+from bot import service_status
+from bot.utils import global_status_color, last_check_time_str
 """
 Discord Bot
 """
 client = discord.Client()
+
+async def status_task():
+    # CONFIG['channel_id'] == 0 OR CONFIG['status_message_id'] == 0:
+    try:
+        statusmsg = await client.get_channel(CONFIG.channel_id).fetch_message(CONFIG.status_message_id)
+    except Exception:
+        print("ERROR CONFIG channel_id and status_message_id, cant fetch status message")
+        print("check permissions and if that message exist")
+        return
+    statusmsg = await client.get_channel(CONFIG.channel_id).fetch_message(CONFIG.status_message_id)
+    await statusmsg.edit(content="Loading status...")
+    
+    await client.change_presence(status=discord.Status.idle, activity=discord.Game("Siema"))  
+
+    while True:
+        stat_array = []
+        check_time_start = time.time()
+
+        for s in CONFIG.services:
+            if s.type == "minecraft":
+                stat_array.append(service_status.minecraft(s))
+            else:
+                print("Unsupported type:", s.type)
+
+        check_time_ms = int((time.time() - check_time_start)*1000)
+
+
+
+        embed = discord.Embed(colour=global_status_color(stat_array), description="", timestamp=datetime.utcnow())
+        embed.set_author(name=CONFIG.embed_title)
+        embed.set_footer(text=last_check_time_str(check_time_ms))
+        for s in stat_array:
+            embed.add_field(name=s.title_full(), value=s.desc, inline=False)
+        await statusmsg.edit(content="", embed=embed)
+
+        await asyncio.sleep(CONFIG.update_time_sek)
+
+    
 @client.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print("Invite link: https://discord.com/api/oauth2/authorize?client_id={0}&permissions=280640&scope=bot".format(client.user.id))
+    print('Name: {0.user}'.format(client))
+    client.loop.create_task(status_task())
 
 @client.event
 async def on_message(message):
     if message.author == client.user:
         return
+    if message.author.bot:
+        return
+    
+    tag = "<@!"+str(client.user.id)+">"
+    tag2 = "<@"+str(client.user.id)+">"
+    if message.content.startswith(tag) or message.content.startswith(tag2):
+        # removing mention
+        message.content = message.content.replace(tag, "")
+        message.content = message.content.replace(tag2, "")
+        message.content = message.content.strip()
 
-    if message.content.startswith('$hello'):
-        await message.channel.send('Hello!')
-    elif message.content.startswith('$mc'):
-        import minecraft
-        await minecraft.server_status(CONFIG, message)
+        if message.content.startswith('setuphere'):
+            thismsg = await message.channel.send("Load...")
+            await thismsg.edit(content="If you want status display here add this to config end reload\n```\"channel_id\": {0}, \n\"status_message_id\": {1}, ```".format(message.channel.id, thismsg.id))
+
+        else:
+          await message.channel.send("usage @mention setuphere")  
+
+    #import minecraft
+    #await minecraft.server_status(CONFIG, message)
 
 try:
-    client.run(CONFIG['token'])
+    client.run(CONFIG.token)
 except:
     print("Invalid token :(")
+    sys.exit(0)

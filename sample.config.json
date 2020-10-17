@@ -1,7 +1,11 @@
 {
     "token": "paste here discord bot token",
-    "channel_id": 302535592204566539,
-    "status_message_id": 292831199318114304,
-	
-	"minecraft_default": "IP:PORT"
+    "channel_id": 302535592204566539, 
+    "status_message_id": 292831199318114304, 
+    "update_time_sek": 10,
+    "embed_title": ":satellite: Services Status :satellite_orbital: :satellite_orbital:",
+    "services": [
+        {"name": "Hypixel.net", "type":"minecraft", "host":"hypixel.net"},
+        {"name": "EarthMC.net", "type":"minecraft", "host":"play.EarthMC.net"}
+    ]
 }
