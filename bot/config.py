@@ -24,11 +24,21 @@ class Service():
     name = ""
     type = ""
     host = ""
+    url = ""
 
     def __init__(self, json_service_config):
         self.name = json_service_config["name"]
         self.type = json_service_config["type"]
-        self.host = json_service_config["host"]
+        try:
+            self.host = json_service_config["host"]
+        except:
+            pass
+        try:
+            self.url = json_service_config["url"]
+        except:
+            pass
+    
+
 
 
 config_str = os.environ.get('CONFIG', None)
