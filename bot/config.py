@@ -1,6 +1,7 @@
 import json
 import sys
 import os
+import time
 
 
 class Config():
@@ -26,6 +27,12 @@ class Service():
     host = ""
     url = ""
 
+    last_online = int(time.time())
+    last_offline = int(time.time())
+    status = False
+    status_title = ""
+    status_desc = ""
+
     def __init__(self, json_service_config):
         self.name = json_service_config["name"]
         self.type = json_service_config["type"]
@@ -38,6 +45,72 @@ class Service():
         except:
             pass
     
+    def status_emoji(self):
+        if self.status:
+            return ":white_check_mark:"
+        return ":x:"
+    
+    def title_full(self):
+        return self.status_emoji()+" "+self.status_title
+    
+    def desc_full(self):
+        return self.status_desc+"\n"+self.uptime()
+    
+    def set_online(self):
+        self.status = True
+        self.last_online = int(time.time())
+    
+    def set_offline(self):
+        self.status = False
+        self.last_offline = int(time.time())
+    
+    def uptime(self):
+        if self.last_offline > self.last_online:
+            delta = self.last_offline - self.last_online
+            return "Last online: "+self.seconds2str(delta)+" ago"
+
+        if self.last_offline < self.last_online:
+            delta = self.last_online - self.last_offline
+            return "Uptime: "+self.seconds2str(delta)
+    
+    def seconds2str(self, time):
+        days =  int(time / 86400)
+        time = time - (days*86400)
+
+        hours =  int(time / 3600)
+        time = time - (hours*3600)
+
+        minutes = int(time / 60)
+        time = time - (minutes*60)
+
+        out = ""
+
+        if days != 0:
+            if days == 1:
+                out += "1 day "
+            else:
+                out += "{} days ".format(days)
+
+        if hours != 0:
+            if hours == 1:
+                out += "1 hour "
+            else:
+                out += "{} hours ".format(hours)   
+
+        if minutes != 0:
+            if minutes == 1:
+                out += "1 minute "
+            else:
+                out += "{} minutes ".format(minutes)
+
+        if time != 0:
+            if time == 1:
+                out += "1 second"
+            else:
+                out += "{} seconds".format(time)
+        return out
+
+
 
 
 

@@ -28,31 +28,30 @@ async def status_task():
     await client.change_presence(status=discord.Status.idle, activity=discord.Game("Starting..."))  
 
     while True:
-        stat_array = []
         check_time_start = time.time()
 
         for s in CONFIG.services:
             if s.type == "minecraft":
-                stat_array.append(service_status.minecraft(s))
+                service_status.minecraft(s)
             elif s.type == "port":
-                stat_array.append(service_status.port_service(s))
+                service_status.port_service(s)
             elif s.type == "url":
-                stat_array.append(service_status.url_service(s))    
+                service_status.url_service(s)
             else:
                 print("Unsupported type:", s.type)
 
         check_time_ms = int((time.time() - check_time_start)*1000)
 
         # update Embed
-        embed = discord.Embed(colour=global_status_color(stat_array), description="", timestamp=datetime.utcnow())
+        embed = discord.Embed(colour=global_status_color(CONFIG.services), description="", timestamp=datetime.utcnow())
         embed.set_author(name=CONFIG.embed_title)
         embed.set_footer(text=last_check_time_str(check_time_ms))
-        for s in stat_array:
-            embed.add_field(name=s.title_full(), value=s.desc, inline=False)
+        for s in CONFIG.services:
+            embed.add_field(name=s.title_full(), value=s.desc_full(), inline=False)
         await statusmsg.edit(content="", embed=embed)
 
         # update activity
-        await update_presence(client, stat_array)
+        await update_presence(client, CONFIG.services)
 
         await asyncio.sleep(CONFIG.update_time_sek)
 
@@ -84,9 +83,6 @@ async def on_message(message):
 
         else:
           await message.channel.send("usage @mention setuphere")  
-
-    #import minecraft
-    #await minecraft.server_status(CONFIG, message)
 
 try:
     client.run(CONFIG.token)

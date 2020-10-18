@@ -13,19 +13,16 @@ def minecraft(service):
     server = MinecraftServer.lookup(service.host)
     try:
         status_res = server.status()
-        stat = ServiceStatus()
-        stat.status = True
-        stat.service = service
-        stat.title = service.name
-        stat.desc  = "{0.players.online}/{0.players.max} {1} ms".format(status_res, int(status_res.latency))
-        return stat
+        
+        service.set_online()
+        service.service = service
+        service.status_title = service.name
+        service.status_desc  = "{0.players.online}/{0.players.max} {1} ms".format(status_res, int(status_res.latency))
     except:
-        stat = ServiceStatus()
-        stat.status = False
-        stat.service = service
-        stat.title = service.name
-        stat.desc  = "Offline"
-        return stat
+        service.set_offline()
+        service.service = service
+        service.status_title = service.name
+        service.status_desc  = "Offline"
 
 
 def port_service(service):
@@ -39,44 +36,26 @@ def port_service(service):
         except:
             return False
 
-    stat = ServiceStatus()
-    stat.service = service
-    stat.title = service.name
+    service.service = service
+    service.status_title = service.name
     host = service.host.split(":")[0]
     port = int(service.host.split(":")[1])
     if checkPort(host, port):
-        stat.status = False
-        stat.desc  = "Offline"
+        service.set
+        service.set_offline()
+        service.status_desc  = "Offline"
     else:
-        stat.status = True
-        stat.desc  = "Online"
-    return stat
+        service.set_online()
+        service.status_desc  = "Online"
 
 def url_service(service):
     r = requests.get(service.url, headers = {'User-Agent': 'Discord Status Bot'})
 
-    stat = ServiceStatus()
-    stat.service = service
-    stat.title = service.name
+    service.status_title = service.name
     if r.status_code != 200:
-        stat.status = False
-        stat.desc  = "HTTP {0}".format(r.status_code)
+        service.set_offline()
+        service.status_desc  = "HTTP {0}".format(r.status_code)
     else:
-        stat.status = True
-        stat.desc  = "Online"
-    return stat
+        service.set_online()
+        service.status_desc  = "Online"
 
-
-class ServiceStatus():
-    status = False
-    service = None # Service form config
-    title = ""
-    desc = ""
-
-    def status_emoji(self):
-        if self.status:
-            return ":white_check_mark:"
-        return ":x:"
-    
-    def title_full(self):
-        return self.status_emoji()+" "+self.title
