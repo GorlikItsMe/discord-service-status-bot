@@ -47,7 +47,7 @@ async def status_task():
         embed.set_author(name=CONFIG.embed_title)
         embed.set_footer(text=last_check_time_str(check_time_ms))
         for s in CONFIG.services:
-            embed.add_field(name=s.title_full(), value=s.status_desc, inline=False)
+            embed.add_field(name=s.title_full(), value=s.desc_full(), inline=False)
         await statusmsg.edit(content="", embed=embed)
 
         # update activity

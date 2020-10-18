@@ -14,12 +14,12 @@ def minecraft(service):
     try:
         status_res = server.status()
         
-        service.status = True
+        service.set_online()
         service.service = service
         service.status_title = service.name
         service.status_desc  = "{0.players.online}/{0.players.max} {1} ms".format(status_res, int(status_res.latency))
     except:
-        service.status = False
+        service.set_offline()
         service.service = service
         service.status_title = service.name
         service.status_desc  = "Offline"
@@ -41,10 +41,11 @@ def port_service(service):
     host = service.host.split(":")[0]
     port = int(service.host.split(":")[1])
     if checkPort(host, port):
-        service.status = False
+        service.set
+        service.set_offline()
         service.status_desc  = "Offline"
     else:
-        service.status = True
+        service.set_online()
         service.status_desc  = "Online"
 
 def url_service(service):
@@ -52,9 +53,9 @@ def url_service(service):
 
     service.status_title = service.name
     if r.status_code != 200:
-        service.status = False
+        service.set_offline()
         service.status_desc  = "HTTP {0}".format(r.status_code)
     else:
-        service.status = True
+        service.set_online()
         service.status_desc  = "Online"
 
