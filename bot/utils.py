@@ -1,7 +1,7 @@
 import discord
 import asyncio
 import time
-
+from datetime import datetime
 
 def global_status_color_int(services):   
     all_online = True
@@ -52,5 +52,5 @@ async def update_presence(client, services):
     else: #partial
         await client.change_presence(status=discord.Status.idle, activity=discord.Game(out))  
         
-    print(time.time(), out)
+    print(datetime.now().strftime("%d/%m/%Y %H:%M:%S"), out)
 
