@@ -1,6 +1,7 @@
 import json
 import sys
 import os
+import time
 
 
 class Config():
@@ -26,6 +27,12 @@ class Service():
     host = ""
     url = ""
 
+    last_online = int(time.time())
+    last_offline = int(time.time())
+    status = False
+    status_title = ""
+    status_desc = ""
+
     def __init__(self, json_service_config):
         self.name = json_service_config["name"]
         self.type = json_service_config["type"]
@@ -38,6 +45,20 @@ class Service():
         except:
             pass
     
+    def status_emoji(self):
+        if self.status:
+            return ":white_check_mark:"
+        return ":x:"
+    
+    def title_full(self):
+        return self.status_emoji()+" "+self.status_title
+    
+    def set_online(self):
+        pass
+    
+    def set_offline(self):
+        pass
+
 
 
 
