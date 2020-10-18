@@ -8,11 +8,12 @@ import time
 
 from bot.config import CONFIG
 from bot import service_status
-from bot.utils import global_status_color, last_check_time_str, update_presence
+from bot.utils import global_status_color, last_check_time_str, update_presence, seconds2str
 """
 Discord Bot
 """
 client = discord.Client()
+start_time = int(time.time())
 
 async def status_task():
     # CONFIG['channel_id'] == 0 OR CONFIG['status_message_id'] == 0:
@@ -45,7 +46,7 @@ async def status_task():
         # update Embed
         embed = discord.Embed(colour=global_status_color(CONFIG.services), description="", timestamp=datetime.utcnow())
         embed.set_author(name=CONFIG.embed_title)
-        embed.set_footer(text=last_check_time_str(check_time_ms))
+        embed.set_footer(text=last_check_time_str(check_time_ms)+" Uptime: "+seconds2str( int(time.time()) - start_time ))
         for s in CONFIG.services:
             embed.add_field(name=s.title_full(), value=s.desc_full(), inline=False)
         await statusmsg.edit(content="", embed=embed)
